@@ -46,7 +46,7 @@
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally
-	"forwardPorts": [8888, 8050, 5000],
+	"forwardPorts": ["3000-3100", 8888, 8050, 5000],
 
 	// Comment out to connect as root instead
 	"remoteUser": "${localEnv:USER}"

@@ -1,0 +1,14 @@
+# Data artifacts
+EmbryoShield/
+.pnpm-store/
+
+# Environment files
+.env
+.devcontainer/.env
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+*Zone.Identifier
