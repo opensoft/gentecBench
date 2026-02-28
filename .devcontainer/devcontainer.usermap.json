@@ -1,0 +1,38 @@
+{
+	"name": "gentecBench - Bio Data Science & Genetics (User Mapped)",
+	"dockerComposeFile": "docker-compose.usermap.yml",
+	"service": "gentec_bench",
+	"workspaceFolder": "/workspace",
+	
+	// Configure tool-specific properties
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-toolsai.jupyter",
+				"ms-toolsai.jupyter-keymap",
+				"ms-toolsai.jupyter-renderers",
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"ms-vscode.remote-containers",
+				"eamodio.gitlens",
+				"ms-vscode-remote.remote-ssh",
+				"redhat.vscode-yaml"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"python.defaultInterpreterPath": "/opt/conda/envs/gentecbench/bin/python",
+				"python.terminal.activateEnvironment": true,
+				"jupyter.notebookFileRoot": "/workspace"
+			}
+		}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally
+	"forwardPorts": [8888, 8050, 5000],
+
+	// The entrypoint script handles user switching, so we don't need remoteUser
+	// User mapping happens automatically at container startup
+	"remoteUser": "${localEnv:USER}"
+}

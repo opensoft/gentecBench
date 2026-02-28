@@ -2,6 +2,9 @@
 EmbryoShield/
 .pnpm-store/
 
+# Nested git repos
+**/.git/
+
 # Environment files
 .env
 .devcontainer/.env

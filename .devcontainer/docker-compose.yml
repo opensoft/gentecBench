@@ -22,7 +22,40 @@ services:
       - ~/projects:/projects:cached
       - ../:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${WIN_SCREENSHOTS:-/dev/null}:/workspace/screenshots:ro  # Windows Screenshots
+
+      # Shell configurations
+      - ~/.zshrc:/home/${USER}/.zshrc:ro
+      - ~/.oh-my-zsh:/home/${USER}/.oh-my-zsh:ro
+      - ~/.p10k.zsh:/home/${USER}/.p10k.zsh:ro
+      - ~/.bashrc:/home/${USER}/.bashrc:ro
+
+      # Git configuration
+      - ~/.gitconfig:/home/${USER}/.gitconfig:ro
+
+      # SSH keys and configuration
+      - ~/.ssh:/home/${USER}/.ssh:ro
+
+      # GitHub CLI configuration
+      - ~/.config/gh:/home/${USER}/.config/gh:ro
+
+      # AI Agent Credentials
+      # Claude (Anthropic)
+      - ~/.claude:/home/${USER}/.claude:cached
+      - ~/.claude.json:/home/${USER}/.claude.json:cached
+      - ~/.claude/.credentials.json:/home/${USER}/.claude/.credentials.json:cached
+      # Codex (OpenAI)
+      - ~/.codex:/home/${USER}/.codex:cached
+      # Gemini (Google)
+      - ~/.gemini:/home/${USER}/.gemini:cached
+      # Grok (xAI)
+      - ~/.grok:/home/${USER}/.grok:ro
+      # GitHub Copilot CLI
+      - ~/.copilot-cli:/home/${USER}/.copilot-cli:ro
+
+      # Project-specific
+      - ~/.basespace:/home/${USER}/.basespace
+      - ~/projects:/home/${USER}/projects:cached
+      - ${WIN_SCREENSHOTS:-/dev/null}:/workspace/screenshots:ro
     
     # Forward common ports
     ports:

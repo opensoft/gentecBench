@@ -4,12 +4,12 @@
 "service": "gentec_bench",
 	"workspaceFolder": "/projects",
 	
-	// Mount host home directory directly for seamless config/SSH access
+	// AI cred mounts for VS Code extensions (specific mounts in docker-compose.yml)
 	"mounts": [
-		// Current workspace (gentecBench)
-		"source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-		// Host home directory mounted directly - gives access to SSH, configs, dotfiles
-		"source=${localEnv:HOME},target=/home/${localEnv:USER},type=bind,consistency=cached"
+		// Claude (Anthropic) - needed by VS Code Claude extension
+		"source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached",
+		// Codex (OpenAI) - needed by VS Code Codex extension
+		"source=${localEnv:HOME}/.codex,target=/root/.codex,type=bind,consistency=cached"
 	],
 	
 	// Container environment variables

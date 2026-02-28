@@ -1,0 +1,53 @@
+# Project name for organizing gentecBench containers in Docker Desktop
+name: gentec-bench
+
+services:
+  gentec_bench:
+    build:
+      context: .
+      dockerfile: Dockerfile.usermap
+      args:
+        BASE_IMAGE: gentec-bench:latest
+    
+    container_name: gentec_bench
+    
+    # Mount your workspace
+    volumes:
+      - ../:/workspace:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.gitconfig:/home/${USER}/.gitconfig:ro
+      - ~/.ssh:/home/${USER}/.ssh:ro
+      - ~/.basespace:/home/${USER}/.basespace
+      - ~/projects:/home/${USER}/projects:cached
+      # Windows Screenshots folder
+      - ${WINDOWS_SCREENSHOTS:-/mnt/c/Users/brett.heap/Pictures/Screenshots}:/screenshots:cached
+    
+    # Forward common ports
+    ports:
+      - "3000-3100:3000-3100"  # Web servers
+      - "8888:8888"  # Jupyter
+      - "8050:8050"  # Dash/Plotly
+      - "5050:5000"  # Flask
+    
+    # Keep container running
+    command: sleep infinity
+    
+    # Set working directory
+    working_dir: /workspace
+    
+    # Environment variables for user mapping (entrypoint uses these)
+    environment:
+      - USERNAME=${USER}
+      - USER_UID=${UID:-1000}
+      - USER_GID=${GID:-1000}
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN:-gentecbench}
+    
+    # Connect to shared gentecBench network
+    networks:
+      - gentec_bench
+
+# Shared network for gentecBench containers
+networks:
+  gentec_bench:
+    name: gentec_bench
+    driver: bridge

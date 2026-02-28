@@ -1,0 +1,25 @@
+# Layer 4: User Mapping Layer
+# Takes gentec-bench image and creates/remaps user at runtime
+# This layer is tiny and fast to rebuild - allows base images to be shared across workstations
+
+ARG BASE_IMAGE=gentec-bench:latest
+
+FROM ${BASE_IMAGE}
+
+LABEL layer="4"
+LABEL layer.name="gentec-bench-usermap"
+LABEL layer.version="1.0.0"
+LABEL layer.description="Runtime user mapping for gentec-bench"
+
+USER root
+
+# Install gosu for safe user switching
+RUN apt-get update && apt-get install -y gosu && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["sleep", "infinity"]

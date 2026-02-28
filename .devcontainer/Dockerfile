@@ -22,10 +22,13 @@ RUN wget "https://launch.basespace.illumina.com/CLI/latest/amd64-linux/bs" -O /u
 # ========================================
 
 # Create bfx environment - bioinformatics tools
-RUN conda create -n bfx -y \
-    -c conda-forge -c bioconda \
-    art bcftools bedtools bwa fastqc minimap2 \
-    mosdepth multiqc picard samtools seqtk snpeff \
+# Split into smaller groups to avoid solver issues
+# Note: art, picard, snpeff removed due to dependency conflicts - install separately if needed
+RUN conda create -n bfx -y python=3.11 \
+    && conda install -n bfx -y -c conda-forge -c bioconda \
+    bcftools bedtools bwa fastqc samtools \
+    && conda install -n bfx -y -c conda-forge -c bioconda \
+    minimap2 mosdepth multiqc seqtk \
     && conda clean -afy
 
 # Create nf environment - Nextflow pipeline engine
