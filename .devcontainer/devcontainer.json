@@ -2,7 +2,7 @@
 "name": "gentecBench - Bio Data Science & Genetics",
 	"dockerComposeFile": "docker-compose.yml",
 "service": "gentec_bench",
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/projects",
 	
 	// Mount host home directory directly for seamless config/SSH access
 	"mounts": [

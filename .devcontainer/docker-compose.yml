@@ -18,6 +18,8 @@ services:
     volumes:
       # Mount full host home directory
       - ~:/home/${USER}:cached
+      # Mount projects folder for VS Code explorer
+      - ~/projects:/projects:cached
       - ../:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock
       - ${WIN_SCREENSHOTS:-/dev/null}:/workspace/screenshots:ro  # Windows Screenshots
