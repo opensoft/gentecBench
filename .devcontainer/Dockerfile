@@ -1,19 +1,28 @@
-# gentecBench - Genetics & Genomics
-# Built on biobench-base (Layer 1) which provides:
+# Layer 2: gentecBench - Genetics & Genomics
+# USER-AGNOSTIC: No user creation — Layer 3 handles user setup
+#
+# Built on biobench-base:latest (Layer 1c) which provides:
 #   - Everything from Layer 0 (Ubuntu 24.04, git, gh CLI, zsh, etc.)
 #   - Miniconda with bioconda + conda-forge channels
-#   - User setup matching host user
+#
+# Usage:
+#   docker build -t gentec-bench:latest .
 
-ARG USERNAME=brett
+FROM biobench-base:latest
 
-FROM biobench-base:${USERNAME}
-
+# Container version labels
+LABEL layer="2"
 LABEL layer.name="gentec-bench"
-LABEL layer.version="0.6.0"
-LABEL layer.description="Genetics and genomics workbench"
+LABEL layer.version="0.7.0"
+LABEL layer.description="Genetics and genomics workbench (user-agnostic)"
+
+USER root
+
+# ========================================
+# TOOLS
+# ========================================
 
 # Install Illumina BaseSpace CLI
-USER root
 RUN wget "https://launch.basespace.illumina.com/CLI/latest/amd64-linux/bs" -O /usr/local/bin/bs \
     && chmod +x /usr/local/bin/bs
 
@@ -37,9 +46,5 @@ RUN conda create -n nf -y \
     nextflow nf-core \
     && conda clean -afy
 
-# Ensure conda dirs are owned by the user
-RUN chown -R ${USERNAME}:${USERNAME} ${CONDA_DIR}
-
-USER ${USERNAME}
-
+# Default command
 CMD ["sleep", "infinity"]

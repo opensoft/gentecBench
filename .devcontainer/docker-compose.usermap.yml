@@ -8,19 +8,54 @@ services:
       dockerfile: Dockerfile.usermap
       args:
         BASE_IMAGE: gentec-bench:latest
+        USERNAME: ${USER}
+        USER_UID: ${UID:-1000}
+        USER_GID: ${GID:-1000}
     
     container_name: gentec_bench
     
     # Mount your workspace
     volumes:
+      # Mount full host home directory
+      - ~:/home/${USER}:cached
+      # Mount projects folder for VS Code explorer
+      - ~/projects:/projects:cached
       - ../:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock
+
+      # Shell configurations
+      - ~/.zshrc:/home/${USER}/.zshrc:ro
+      - ~/.oh-my-zsh:/home/${USER}/.oh-my-zsh:ro
+      - ~/.p10k.zsh:/home/${USER}/.p10k.zsh:ro
+      - ~/.bashrc:/home/${USER}/.bashrc:ro
+
+      # Git configuration
       - ~/.gitconfig:/home/${USER}/.gitconfig:ro
+
+      # SSH keys and configuration
       - ~/.ssh:/home/${USER}/.ssh:ro
+
+      # GitHub CLI configuration
+      - ~/.config/gh:/home/${USER}/.config/gh:ro
+
+      # AI Agent Credentials
+      # Claude (Anthropic)
+      - ~/.claude:/home/${USER}/.claude:cached
+      - ~/.claude.json:/home/${USER}/.claude.json:cached
+      - ~/.claude/.credentials.json:/home/${USER}/.claude/.credentials.json:cached
+      # Codex (OpenAI)
+      - ~/.codex:/home/${USER}/.codex:cached
+      # Gemini (Google)
+      - ~/.gemini:/home/${USER}/.gemini:cached
+      # Grok (xAI)
+      - ~/.grok:/home/${USER}/.grok:ro
+      # GitHub Copilot CLI
+      - ~/.copilot-cli:/home/${USER}/.copilot-cli:ro
+
+      # Project-specific
       - ~/.basespace:/home/${USER}/.basespace
       - ~/projects:/home/${USER}/projects:cached
-      # Windows Screenshots folder
-      - ${WINDOWS_SCREENSHOTS:-/mnt/c/Users/brett.heap/Pictures/Screenshots}:/screenshots:cached
+      - ${WIN_SCREENSHOTS:-/dev/null}:/workspace/screenshots:ro
     
     # Forward common ports
     ports:
@@ -35,11 +70,11 @@ services:
     # Set working directory
     working_dir: /workspace
     
-    # Environment variables for user mapping (entrypoint uses these)
+    # Run as host user
+    user: "${UID:-1000}:${GID:-1000}"
+    
+    # Environment variables
     environment:
-      - USERNAME=${USER}
-      - USER_UID=${UID:-1000}
-      - USER_GID=${GID:-1000}
       - JUPYTER_TOKEN=${JUPYTER_TOKEN:-gentecbench}
     
     # Connect to shared gentecBench network

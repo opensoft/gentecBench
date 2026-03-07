@@ -32,7 +32,6 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally
 	"forwardPorts": [8888, 8050, 5000],
 
-	// The entrypoint script handles user switching, so we don't need remoteUser
-	// User mapping happens automatically at container startup
+	// User is baked into the image at build time via Dockerfile.usermap
 	"remoteUser": "${localEnv:USER}"
 }

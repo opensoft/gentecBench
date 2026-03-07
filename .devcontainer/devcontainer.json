@@ -1,53 +1,86 @@
 {
-"name": "gentecBench - Bio Data Science & Genetics",
-	"dockerComposeFile": "docker-compose.yml",
-"service": "gentec_bench",
-	"workspaceFolder": "/projects",
-	
-	// AI cred mounts for VS Code extensions (specific mounts in docker-compose.yml)
-	"mounts": [
-		// Claude (Anthropic) - needed by VS Code Claude extension
-		"source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached",
-		// Codex (OpenAI) - needed by VS Code Codex extension
-		"source=${localEnv:HOME}/.codex,target=/root/.codex,type=bind,consistency=cached"
-	],
-	
-	// Container environment variables
-	"containerEnv": {
-		"USERNAME": "${localEnv:USER}",
-		"USER_UID": "${localEnv:UID:-1000}",
-		"USER_GID": "${localEnv:GID:-1000}",
-		"DEBUG": "false"
-	},
-	
-	// Configure tool-specific properties
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"ms-toolsai.jupyter",
-				"ms-toolsai.jupyter-keymap",
-				"ms-toolsai.jupyter-renderers",
-				"GitHub.copilot",
-				"GitHub.copilot-chat",
-				"ms-vscode.remote-containers",
-				"eamodio.gitlens",
-				"ms-vscode-remote.remote-ssh",
-				"redhat.vscode-yaml"
-			],
-			"settings": {
-				"terminal.integrated.defaultProfile.linux": "zsh",
-"python.defaultInterpreterPath": "/opt/conda/envs/gentecbench/bin/python",
-				"python.terminal.activateEnvironment": true,
-				"jupyter.notebookFileRoot": "/workspace"
-			}
-		}
-	},
+    "name": "gentecBench - Bio Data Science & Genetics",
+    "initializeCommand": "bash ${localWorkspaceFolder}/../../scripts/ensure-layer3.sh --base gentec-bench:latest --chown /opt/conda",
+    "image": "gentec-bench:${localEnv:USER}",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "python.defaultInterpreterPath": "/opt/conda/envs/bfx/bin/python",
+                "python.terminal.activateEnvironment": true,
+                "jupyter.notebookFileRoot": "/workspace"
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter",
+                "ms-toolsai.jupyter-keymap",
+                "ms-toolsai.jupyter-renderers",
+                "github.copilot",
+                "eamodio.gitlens",
+                "redhat.vscode-yaml"
+            ]
+        }
+    },
+    "containerEnv": {
+        "SHELL": "/bin/zsh",
+        "CONDA_DIR": "/opt/conda",
+        "JUPYTER_TOKEN": "gentecbench"
+    },
+    "remoteUser": "${localEnv:USER}",
+    "workspaceFolder": "/workspace",
+    "mounts": [
+        "source=gentecbench-zshhistory,target=/home/${localEnv:USER}/.zsh_history,type=volume",
+        "source=${localEnv:HOME}/projects,target=/workspace/projects,type=bind",
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally
-	"forwardPorts": ["3000-3100", 8888, 8050, 5000],
+        // Shell configurations
+        "source=${localEnv:HOME}/.zshrc,target=/home/${localEnv:USER}/.zshrc,type=bind,readonly",
+        "source=${localEnv:HOME}/.oh-my-zsh,target=/home/${localEnv:USER}/.oh-my-zsh,type=bind,readonly",
+        "source=${localEnv:HOME}/.p10k.zsh,target=/home/${localEnv:USER}/.p10k.zsh,type=bind,readonly",
+        "source=${localEnv:HOME}/.bashrc,target=/home/${localEnv:USER}/.bashrc,type=bind,readonly",
 
-	// Comment out to connect as root instead
-	"remoteUser": "${localEnv:USER}"
+        // Git configuration
+        "source=${localEnv:HOME}/.gitconfig,target=/home/${localEnv:USER}/.gitconfig,type=bind,readonly",
+
+        // SSH keys and configuration
+        "source=${localEnv:HOME}/.ssh,target=/home/${localEnv:USER}/.ssh,type=bind,readonly",
+
+        // GitHub CLI configuration
+        "source=${localEnv:HOME}/.config/gh,target=/home/${localEnv:USER}/.config/gh,type=bind,readonly",
+
+        // AI Agent Credentials
+        // Claude (Anthropic)
+        "source=${localEnv:HOME}/.claude,target=/home/${localEnv:USER}/.claude,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.claude.json,target=/home/${localEnv:USER}/.claude.json,type=bind,consistency=cached",
+        // Codex (OpenAI)
+        "source=${localEnv:HOME}/.codex,target=/home/${localEnv:USER}/.codex,type=bind,consistency=cached",
+        // Gemini (Google)
+        "source=${localEnv:HOME}/.gemini,target=/home/${localEnv:USER}/.gemini,type=bind,consistency=cached",
+        // Grok (xAI)
+        "source=${localEnv:HOME}/.grok,target=/home/${localEnv:USER}/.grok,type=bind,readonly",
+        // GitHub Copilot CLI
+        "source=${localEnv:HOME}/.copilot-cli,target=/home/${localEnv:USER}/.copilot-cli,type=bind,readonly",
+
+        // Project-specific
+        "source=${localEnv:HOME}/.basespace,target=/home/${localEnv:USER}/.basespace,type=bind,consistency=cached"
+    ],
+    "forwardPorts": [8888, 8050, 5000, 3000],
+    "portsAttributes": {
+        "8888": {
+            "label": "Jupyter",
+            "onAutoForward": "notify"
+        },
+        "8050": {
+            "label": "Dash/Plotly",
+            "onAutoForward": "notify"
+        },
+        "5000": {
+            "label": "Flask",
+            "onAutoForward": "notify"
+        },
+        "3000": {
+            "label": "Web App",
+            "onAutoForward": "notify"
+        }
+    }
 }

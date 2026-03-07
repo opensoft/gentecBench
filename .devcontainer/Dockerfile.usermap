@@ -1,25 +1,39 @@
 # Layer 4: User Mapping Layer
-# Takes gentec-bench image and creates/remaps user at runtime
-# This layer is tiny and fast to rebuild - allows base images to be shared across workstations
+# Takes a generic gentec-bench image and bakes in the correct host user at build time.
+# Base images (Layers 0-3) can be built once and shared; only this thin layer
+# needs rebuilding per-user.
 
 ARG BASE_IMAGE=gentec-bench:latest
-
 FROM ${BASE_IMAGE}
 
 LABEL layer="4"
 LABEL layer.name="gentec-bench-usermap"
-LABEL layer.version="1.0.0"
-LABEL layer.description="Runtime user mapping for gentec-bench"
+LABEL layer.version="2.0.0"
+LABEL layer.description="Build-time user mapping for gentec-bench"
+
+ARG USERNAME=brett
+ARG USER_UID=1000
+ARG USER_GID=1000
 
 USER root
 
-# Install gosu for safe user switching
-RUN apt-get update && apt-get install -y gosu && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Create or remap group and user to match host
+RUN if getent group ${USER_GID} >/dev/null 2>&1; then \
+      EXISTING_GROUP=$(getent group ${USER_GID} | cut -d: -f1); \
+      [ "$EXISTING_GROUP" != "${USERNAME}" ] && groupmod -n ${USERNAME} $EXISTING_GROUP || true; \
+    else \
+      groupadd --gid ${USER_GID} ${USERNAME}; \
+    fi \
+    && if getent passwd ${USER_UID} >/dev/null 2>&1; then \
+         EXISTING_USER=$(getent passwd ${USER_UID} | cut -d: -f1); \
+         [ "$EXISTING_USER" != "${USERNAME}" ] && usermod -l ${USERNAME} -d /home/${USERNAME} -m $EXISTING_USER || true; \
+         usermod -g ${USER_GID} ${USERNAME} 2>/dev/null || true; \
+       else \
+         useradd --uid ${USER_UID} --gid ${USER_GID} -m -s /bin/zsh ${USERNAME}; \
+       fi \
+    && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME} \
+    && [ -d /opt/conda ] && chown -R ${USERNAME}:${USERNAME} /opt/conda || true
 
-# Copy entrypoint script
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+USER ${USERNAME}
+WORKDIR /workspace
 CMD ["sleep", "infinity"]
