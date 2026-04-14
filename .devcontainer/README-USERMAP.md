@@ -29,7 +29,7 @@ The Layer 4 approach solves a key problem: **image portability**.
 ```
 Layer 0: workbench-base (Ubuntu, system tools, generic user)
     ↓
-Layer 1c: biobench-base (Miniconda, scientific Python)
+Layer 1c: bio-bench-base (Miniconda, scientific Python)
     ↓
 Layer 2: gentec-bench (Bioinformatics tools, genetics packages)
     ↓

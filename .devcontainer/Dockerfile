@@ -1,14 +1,15 @@
 # Layer 2: gentecBench - Genetics & Genomics
 # USER-AGNOSTIC: No user creation — Layer 3 handles user setup
 #
-# Built on biobench-base:latest (Layer 1c) which provides:
+# Built on bio-bench-base:latest (Layer 1c) which provides:
 #   - Everything from Layer 0 (Ubuntu 24.04, git, gh CLI, zsh, etc.)
 #   - Miniconda with bioconda + conda-forge channels
 #
 # Usage:
 #   docker build -t gentec-bench:latest .
 
-FROM biobench-base:latest
+ARG BASE_IMAGE=bio-bench-base:latest
+FROM ${BASE_IMAGE}
 
 # Container version labels
 LABEL layer="2"

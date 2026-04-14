@@ -13,15 +13,20 @@ echo "=========================================="
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+source "$REPO_DIR/scripts/lib/image-names.sh"
 cd "$SCRIPT_DIR"
+
+BASE_IMAGE="$(resolve_existing_image "$(family_base_image bio)" "$(legacy_family_base_image bio 2>/dev/null || true)" || true)"
 
 echo "Configuration:"
 echo "  Tag: gentec-bench:latest (user-agnostic)"
+echo "  Base image: ${BASE_IMAGE:-$(family_base_image bio)}"
 echo ""
 
 # Check if Layer 1c exists
-if ! docker image inspect "biobench-base:latest" >/dev/null 2>&1; then
-    echo "❌ Error: Layer 1c (biobench-base:latest) not found!"
+if [ -z "$BASE_IMAGE" ]; then
+    echo "❌ Error: Layer 1c ($(family_base_image bio)) not found!"
     echo ""
     echo "Please build Layer 1c first:"
     echo "  cd ../../base-image"
@@ -32,6 +37,7 @@ fi
 # Build the image
 echo "Building gentec-bench:latest..."
 docker build \
+    --build-arg BASE_IMAGE="$BASE_IMAGE" \
     -t "gentec-bench:latest" \
     .
 

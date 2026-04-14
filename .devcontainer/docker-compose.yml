@@ -1,88 +1,12 @@
-# Project name for organizing gentecBench containers in Docker Desktop
-name: gentec-bench
+# Project name for organizing bio benches in Docker Desktop
+name: bio-benches
 
 services:
-  gentec_bench:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        USERNAME: ${USER}
-        USER_UID: ${UID:-1000}
-        USER_GID: ${GID:-1000}
-        DEBUG: false
-    
-    container_name: gentec_bench
-    
-    # Mount your workspace
-    volumes:
-      # Mount full host home directory
-      - ~:/home/${USER}:cached
-      # Mount projects folder for VS Code explorer
-      - ~/projects:/projects:cached
-      - ../:/workspace:cached
-      - /var/run/docker.sock:/var/run/docker.sock
-
-      # Shell configurations
-      - ~/.zshrc:/home/${USER}/.zshrc:ro
-      - ~/.oh-my-zsh:/home/${USER}/.oh-my-zsh:ro
-      - ~/.p10k.zsh:/home/${USER}/.p10k.zsh:ro
-      - ~/.bashrc:/home/${USER}/.bashrc:ro
-
-      # Git configuration
-      - ~/.gitconfig:/home/${USER}/.gitconfig:ro
-
-      # SSH keys and configuration
-      - ~/.ssh:/home/${USER}/.ssh:ro
-
-      # GitHub CLI configuration
-      - ~/.config/gh:/home/${USER}/.config/gh:ro
-
-      # AI Agent Credentials
-      # Claude (Anthropic)
-      - ~/.claude:/home/${USER}/.claude:cached
-      - ~/.claude.json:/home/${USER}/.claude.json:cached
-      - ~/.claude/.credentials.json:/home/${USER}/.claude/.credentials.json:cached
-      # Codex (OpenAI)
-      - ~/.codex:/home/${USER}/.codex:cached
-      # Gemini (Google)
-      - ~/.gemini:/home/${USER}/.gemini:cached
-      # Grok (xAI)
-      - ~/.grok:/home/${USER}/.grok:ro
-      # GitHub Copilot CLI
-      - ~/.copilot-cli:/home/${USER}/.copilot-cli:ro
-
-      # Project-specific
-      - ~/.basespace:/home/${USER}/.basespace
-      - ~/projects:/home/${USER}/projects:cached
-      - ${WIN_SCREENSHOTS:-/dev/null}:/workspace/screenshots:ro
-    
-    # Forward common ports
-    ports:
-      - "3000-3100:3000-3100"  # Web servers
-      - "8888:8888"  # Jupyter
-      - "8050:8050"  # Dash/Plotly
-      - "5050:5000"  # Flask
-    
-    # Keep container running
+  gentec-bench:
+    image: gentec-bench:${USER:-brett}
+    container_name: gentec-bench
+    env_file: .env
     command: sleep infinity
-    
-    # Set working directory
     working_dir: /workspace
-    
-    # Set user
-    user: "${UID:-1000}:${GID:-1000}"
-    
-    # Environment variables
     environment:
       - JUPYTER_TOKEN=${JUPYTER_TOKEN:-gentecbench}
-    
-    # Connect to shared gentecBench network
-    networks:
-      - gentec_bench
-
-# Shared network for gentecBench containers
-networks:
-  gentec_bench:
-    name: gentec_bench
-    driver: bridge

@@ -14,6 +14,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCH_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BIO_BASE_DIR="$(cd "$BENCH_DIR/../base-image" && pwd)"
 WORKBENCH_BASE_DIR="$(cd "$BENCH_DIR/../../base-image" && pwd)"
+REPO_DIR="$(cd "$BENCH_DIR/../.." && pwd)"
+source "$REPO_DIR/scripts/lib/image-names.sh"
 
 # Parse arguments
 USERNAME=${1:-$(whoami)}
@@ -45,30 +47,29 @@ build_layer() {
 }
 
 # Check and build Layer 0: workbench-base
-if ! image_exists "workbench-base:$USERNAME"; then
-    echo "⚠️  Layer 0 (workbench-base:$USERNAME) not found. Building..."
+if ! image_exists "workbench-base:latest"; then
+    echo "⚠️  Layer 0 (workbench-base:latest) not found. Building..."
     echo ""
     build_layer "Layer 0: workbench-base" "$WORKBENCH_BASE_DIR" "build.sh"
 else
-    echo "✓ Layer 0: workbench-base:$USERNAME exists"
+    echo "✓ Layer 0: workbench-base:latest exists"
 fi
 
-# Check and build Layer 1c: biobench-base
-if ! image_exists "biobench-base:$USERNAME"; then
-    echo "⚠️  Layer 1c (biobench-base:$USERNAME) not found. Building..."
+# Check and build Layer 1c: bio-bench-base
+if ! image_exists "$(family_base_image bio)"; then
+    echo "⚠️  Layer 1c ($(family_base_image bio)) not found. Building..."
     echo ""
-    build_layer "Layer 1c: biobench-base" "$BIO_BASE_DIR" "build.sh"
+    build_layer "Layer 1c: $(family_base_image bio)" "$BIO_BASE_DIR" "build.sh"
 else
-    echo "✓ Layer 1c: biobench-base:$USERNAME exists"
+    echo "✓ Layer 1c: $(family_base_image bio) exists"
 fi
 
 # Check and build Layer 2: gentec-bench
-# Note: docker-compose creates image with compose project name
-GENTEC_IMAGE="gentec-bench-gentec_bench:latest"
+GENTEC_IMAGE="gentec-bench:latest"
 if ! image_exists "$GENTEC_IMAGE"; then
     echo "⚠️  Layer 2 ($GENTEC_IMAGE) not found. Building..."
     echo ""
-    build_layer "Layer 2: gentec-bench" "$BENCH_DIR" "setup.sh"
+    build_layer "Layer 2: gentec-bench" "$SCRIPT_DIR" "build.sh"
 else
     echo "✓ Layer 2: $GENTEC_IMAGE exists"
 fi
@@ -93,8 +94,8 @@ echo "✓ All layers built successfully!"
 echo "=========================================="
 echo ""
 echo "Image hierarchy:"
-echo "  Layer 0: workbench-base:$USERNAME"
-echo "  Layer 1c: biobench-base:$USERNAME"
+echo "  Layer 0: workbench-base:latest"
+echo "  Layer 1c: $(family_base_image bio)"
 echo "  Layer 2: $GENTEC_IMAGE"
 echo "  Layer 4: gentec-bench-usermap:latest"
 echo ""

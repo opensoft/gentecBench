@@ -1,7 +1,9 @@
 {
-    "name": "gentecBench - Bio Data Science & Genetics",
+    "name": "bioBenches / gentecBench",
     "initializeCommand": "bash ${localWorkspaceFolder}/../../scripts/ensure-layer3.sh --base gentec-bench:latest --chown /opt/conda",
-    "image": "gentec-bench:${localEnv:USER}",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "gentec-bench",
+    "shutdownAction": "stopCompose",
     "customizations": {
         "vscode": {
             "settings": {
@@ -28,6 +30,7 @@
         "JUPYTER_TOKEN": "gentecbench"
     },
     "remoteUser": "${localEnv:USER}",
+    "updateRemoteUserUID": false,
     "workspaceFolder": "/workspace",
     "mounts": [
         "source=gentecbench-zshhistory,target=/home/${localEnv:USER}/.zsh_history,type=volume",

@@ -6,6 +6,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_DIR="$(cd "$BIO_DIR/.." && pwd)"
+source "$REPO_DIR/scripts/lib/image-names.sh"
 
 # Parse arguments
 USERNAME=${1:-$(whoami)}
@@ -21,21 +23,26 @@ echo "Configuration:"
 echo "  Username: $USERNAME"
 echo ""
 
-# Ensure biobench-base image exists
-if ! docker image inspect "biobench-base:$USERNAME" >/dev/null 2>&1; then
-    echo "biobench-base:$USERNAME not found. Building base image..."
+# Ensure the Layer 1c base image exists
+BASE_IMAGE="$(resolve_existing_image "$(family_base_image bio)" "$(legacy_family_base_image bio 2>/dev/null || true)" || true)"
+if [ -z "$BASE_IMAGE" ]; then
+    echo "$(family_base_image bio) not found. Building base image..."
     if [ -x "$BIO_DIR/setup.sh" ]; then
         "$BIO_DIR/setup.sh" --user "$USERNAME"
     else
-        echo "❌ Error: biobench-base:$USERNAME not found and no bioBenches/setup.sh available."
+        echo "❌ Error: $(family_base_image bio) not found and no bioBenches/setup.sh available."
         echo "Please build the bio base image first."
         exit 1
     fi
 fi
 
-# Build the gentecBench image
-echo "Building gentecBench image..."
-docker compose -f "$SCRIPT_DIR/.devcontainer/docker-compose.yml" build
+if ! docker image inspect "gentec-bench:latest" >/dev/null 2>&1; then
+    echo "Building gentecBench image..."
+    "$SCRIPT_DIR/build-layer.sh" --user "$USERNAME"
+else
+    echo "Ensuring gentec-bench:$USERNAME..."
+    "$REPO_DIR/scripts/ensure-layer3.sh" --base "gentec-bench:latest" --user "$USERNAME" --chown /opt/conda
+fi
 
 echo ""
 echo "✓ gentecBench setup complete!"
