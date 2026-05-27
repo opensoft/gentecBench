@@ -57,6 +57,7 @@
         "source=${localEnv:HOME}/.claude.json,target=/home/${localEnv:USER}/.claude.json,type=bind,consistency=cached",
         // Codex (OpenAI)
         "source=${localEnv:HOME}/.codex,target=/home/${localEnv:USER}/.codex,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.config/ledgerlinc/secrets,target=/home/${localEnv:USER}/.config/ledgerlinc/secrets,type=bind,readonly",
         // Gemini (Google)
         "source=${localEnv:HOME}/.gemini,target=/home/${localEnv:USER}/.gemini,type=bind,consistency=cached",
         // Grok (xAI)
