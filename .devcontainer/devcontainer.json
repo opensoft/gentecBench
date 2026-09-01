@@ -1,6 +1,6 @@
 {
     "name": "bioBenches / gentecBench",
-    "initializeCommand": "bash ${localWorkspaceFolder}/../../scripts/ensure-layer3.sh --base gentec-bench:latest --chown /opt/conda",
+    "initializeCommand": "bash ${localWorkspaceFolder}/../../scripts/prepare-bench-start.sh --container gentec-bench --base gentec-bench:latest --user ${localEnv:USER} --chown /opt/conda --project bio-benches --service gentec-bench",
     "dockerComposeFile": "docker-compose.yml",
     "service": "gentec-bench",
     "shutdownAction": "stopCompose",
