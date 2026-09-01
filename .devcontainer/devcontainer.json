@@ -1,6 +1,6 @@
 {
     "name": "bioBenches / gentecBench",
-    "initializeCommand": "bash ${localWorkspaceFolder}/../../scripts/prepare-bench-start.sh --container gentec-bench --base gentec-bench:latest --user ${localEnv:USER} --chown /opt/conda --project bio-benches --service gentec-bench",
+    "initializeCommand": "mkdir -p \"${localEnv:HOME}/.claude-profiles\" && bash \"${localWorkspaceFolder}/../../scripts/prepare-bench-start.sh\" --container gentec-bench --base gentec-bench:latest --user \"${localEnv:USER}\" --chown /opt/conda --project bio-benches --service gentec-bench",
     "dockerComposeFile": "docker-compose.yml",
     "service": "gentec-bench",
     "shutdownAction": "stopCompose",
