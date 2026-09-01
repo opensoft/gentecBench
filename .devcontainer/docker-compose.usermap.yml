@@ -42,6 +42,7 @@ services:
       # Claude (Anthropic)
       - ~/.claude:/home/${USER}/.claude:cached
       - ~/.claude.json:/home/${USER}/.claude.json:cached
+      - ~/.claude-profiles:/home/${USER}/.claude-profiles:cached
       - ~/.claude/.credentials.json:/home/${USER}/.claude/.credentials.json:cached
       # Codex (OpenAI)
       - ~/.codex:/home/${USER}/.codex:cached
