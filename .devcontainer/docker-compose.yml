@@ -3,6 +3,7 @@ name: bio-benches
 
 services:
   gentec-bench:
+    init: true
     image: gentec-bench:${USER:-brett}
     container_name: gentec-bench
     env_file: .env
