@@ -3,6 +3,7 @@ name: gentec-bench
 
 services:
   gentec_bench:
+    init: true
     build:
       context: .
       dockerfile: Dockerfile.usermap
